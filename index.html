@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Downloader</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>YouTube Downloader</h1>
+  <input type="text" id="url" placeholder="Enter YouTube URL" />
+  <button onclick="getFormats()">Get Formats</button>
+  <div id="format-options"></div>
+  <div id="message"></div>
+
+  <script>
+    async function getFormats() {
+      const url = document.getElementById('url').value;
+      const res = await fetch('/get_formats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      const container = document.getElementById('format-options');
+      container.innerHTML = `<h2>${data.title}</h2><h3>Video Formats</h3>`;
+      data.video.forEach(f => {
+        container.innerHTML += `<button onclick="download('${url}', '${f.format_id}')">${f.resolution} (${f.ext})</button><br>`;
+      });
+      container.innerHTML += `<h3>Audio Formats</h3>`;
+      data.audio.forEach(f => {
+  container.innerHTML += `<button onclick="download('${url}', '${f.format_id}')">${f.label} (${f.ext})</button><br>`;
+  });
+
+}
+
+    function download(url, format_id) {
+      fetch('/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, format_id })
+      }).then(res => {
+        if (res.ok) return res.blob();
+        else throw new Error("Download failed");
+      }).then(blob => {
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "download";
+        link.click();
+      }).catch(err => {
+        document.getElementById('message').textContent = err.message;
+      });
+    }
+  </script>
+</body>
+</html>

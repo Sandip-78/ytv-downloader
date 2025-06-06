@@ -1,17 +1,24 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YouTube Downloader</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>YouTube Downloader</h1>
-  <input type="text" id="url" placeholder="Enter YouTube URL" />
-  <button onclick="getFormats()">Get Formats</button>
-  <div id="format-options"></div>
-  <div id="message"></div>
+  <div class="container">
+    <div class="header">
+      <h1>YouTube Downloader</h1>
+    </div>
+
+    <input type="text" id="url" placeholder="Enter YouTube URL" />
+    <button onclick="getFormats()"> Get Formats</button>
+
+    <div id="format-options"></div>
+    <div id="message"></div>
+  </div>
 
   <script>
     async function getFormats() {
@@ -23,16 +30,15 @@
       });
       const data = await res.json();
       const container = document.getElementById('format-options');
-      container.innerHTML = `<h2>${data.title}</h2><h3>Video Formats</h3>`;
+      container.innerHTML = `<h2>${data.title}</h2><h3>📹 Video Formats</h3>`;
       data.video.forEach(f => {
         container.innerHTML += `<button onclick="download('${url}', '${f.format_id}')">${f.resolution} (${f.ext})</button><br>`;
       });
-      container.innerHTML += `<h3>Audio Formats</h3>`;
+      container.innerHTML += `<h3>🎧 Audio Formats</h3>`;
       data.audio.forEach(f => {
-  container.innerHTML += `<button onclick="download('${url}', '${f.format_id}')">${f.label} (${f.ext})</button><br>`;
-  });
-
-}
+        container.innerHTML += `<button onclick="download('${url}', '${f.format_id}')">${f.label} (${f.ext})</button><br>`;
+      });
+    }
 
     function download(url, format_id) {
       fetch('/download', {
